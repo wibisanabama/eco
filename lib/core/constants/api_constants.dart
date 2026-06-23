@@ -23,5 +23,5 @@ class ApiConstants {
   static const String scanImagesBucket = 'scan-images';
 
   // Google Sign-In
-  static const String googleWebClientId = 'YOUR_GOOGLE_WEB_CLIENT_ID';
+  static const String googleWebClientId = '745237385380-a7dfl0qeq14rimu9ept8eua0kfbtjj9d.apps.googleusercontent.com';
 }
