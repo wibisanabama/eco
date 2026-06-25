@@ -19,13 +19,6 @@ class AuthViewModel extends ChangeNotifier {
   UserModel? get user => _user;
   bool get isAuthenticated => _isAuthenticated;
 
-  /// Prepare Google Sign-In. Must be called before sign-in so the web button
-  /// can render and the credential-exchange listener is wired up.
-  ///
-  /// Subscribing to auth-state changes is done here (not in the constructor)
-  /// because it touches Supabase, which is only initialized once the app has
-  /// booted via `main()` — keeping the constructor side-effect-free lets the
-  /// widget test build the view model without a live Supabase instance.
   Future<void> initialize() async {
     _isAuthenticated = _authRepository.isAuthenticated;
     if (_isAuthenticated) {
@@ -97,6 +90,8 @@ class AuthViewModel extends ChangeNotifier {
       _user = await _authRepository.signInWithEmailPassword(
         email: email,
         password: password,
+        displayName: displayName,
+        email: email,
       );
       _isAuthenticated = true;
       _isLoading = false;
