@@ -24,7 +24,7 @@ A Flutter-based eco-friendly app featuring waste scanning, AI chatbot, weather m
 ### 1. Clone & Flutter Setup
 
 ```bash
-git clone https://github.com/wibisanabama/eco.git
+git clone https://github.com/demmagence/eco.git
 cd eco
 flutter pub get
 ```
