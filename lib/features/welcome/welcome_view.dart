@@ -167,12 +167,32 @@ class _WelcomeViewState extends State<WelcomeView>
                   children: [
                     const Spacer(flex: 2),
 
-                    const Hero(
-                      tag: 'scan_illustration',
-                      child: ScanIllustration(),
+                    // Illustration - collapses on page 1 (login) to avoid overflow
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeInOut,
+                      height: _currentPage == 0 ? (sh * 0.16).clamp(110.0, 160.0) : 0,
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 250),
+                        opacity: _currentPage == 0 ? 1.0 : 0.0,
+                        child: _currentPage == 0
+                            ? const FittedBox(
+                                fit: BoxFit.contain,
+                                child: Hero(
+                                  tag: 'scan_illustration',
+                                  child: ScanIllustration(),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
                     ),
 
-                    SizedBox(height: illHeroGap),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeInOut,
+                      height: _currentPage == 0 ? illHeroGap : 0,
+                      child: const SizedBox.shrink(),
+                    ),
 
                     // Logo + VibEco (2 baris, identik splash)
                     Hero(
@@ -183,7 +203,7 @@ class _WelcomeViewState extends State<WelcomeView>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              padding: EdgeInsets.all(iconPad),
+                              padding: EdgeInsets.all(iconPad * (_currentPage == 0 ? 1.0 : 0.7)),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(iconRadius),
@@ -191,15 +211,15 @@ class _WelcomeViewState extends State<WelcomeView>
                               child: Icon(
                                 Icons.eco,
                                 color: Colors.white,
-                                size: iconSz,
+                                size: iconSz * (_currentPage == 0 ? 1.0 : 0.75),
                               ),
                             ),
-                            SizedBox(height: iconTextGap),
+                            SizedBox(height: iconTextGap * (_currentPage == 0 ? 1.0 : 0.5)),
                             Text(
                               AppStrings.appName,
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: nameFontSz,
+                                fontSize: nameFontSz * (_currentPage == 0 ? 1.0 : 0.85),
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.3,
                               ),
@@ -209,23 +229,39 @@ class _WelcomeViewState extends State<WelcomeView>
                       ),
                     ),
 
-                    SizedBox(height: heroTaglineGap),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeInOut,
+                      height: _currentPage == 0 ? heroTaglineGap : 0,
+                      child: const SizedBox.shrink(),
+                    ),
 
                     // Tagline — slide in sinkron dengan Hero flight (520ms easeOutExpo)
-                    SlideTransition(
-                      position: _taglineSlide,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: taglineHPad),
-                        child: Text(
-                          AppStrings.appTagline,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: taglineFontSz,
-                            color: Colors.white.withValues(alpha: 0.60),
-                            letterSpacing: 0.2,
-                            height: 1.45,
-                          ),
-                        ),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeInOut,
+                      height: _currentPage == 0 ? (sh * 0.05).clamp(24.0, 40.0) : 0,
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 250),
+                        opacity: _currentPage == 0 ? 1.0 : 0.0,
+                        child: _currentPage == 0
+                            ? SlideTransition(
+                                position: _taglineSlide,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: taglineHPad),
+                                  child: Text(
+                                    AppStrings.appTagline,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: taglineFontSz,
+                                      color: Colors.white.withValues(alpha: 0.60),
+                                      letterSpacing: 0.2,
+                                      height: 1.45,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
                       ),
                     ),
 
