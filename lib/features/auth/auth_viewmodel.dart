@@ -40,7 +40,7 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _errorMessage = _parseError(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -70,7 +70,7 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _errorMessage = _parseError(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -96,7 +96,7 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _errorMessage = _parseError(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -136,5 +136,20 @@ class AuthViewModel extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  String _parseError(dynamic e) {
+    final errStr = e.toString();
+    if (errStr.contains('SocketException') ||
+        errStr.contains('Connection refused') ||
+        errStr.contains('ClientException') ||
+        errStr.contains('Connection timed out') ||
+        errStr.contains('TimeoutException') ||
+        errStr.contains('errno = 111')) {
+      return 'Koneksi ke server gagal.\n'
+          '1. Pastikan server backend sudah menyala (jalankan "node server.js").\n'
+          '2. Jalankan perintah "adb reverse tcp:3000 tcp:3000" di terminal komputer Anda jika menggunakan perangkat fisik via USB.';
+    }
+    return errStr.replaceFirst('Exception: ', '');
   }
 }
