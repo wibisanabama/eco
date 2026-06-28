@@ -1,14 +1,25 @@
 # VibEco 🌿
 
-A Flutter-based eco-friendly app featuring waste scanning, AI chatbot, weather monitoring, and environmental insights.
+A Flutter-based eco-friendly app featuring waste scanning, AI chatbot, weather monitoring, and environmental insights. It features a premium, minimalist light-mode design system with a clean, gradient-free interface.
 
-## Tech Stack
+## Tech Stack & Design
 
 - **Frontend**: Flutter (Android, Web)
 - **Backend**: Node.js + Express + MySQL
-- **AI**: Google Gemini (image analysis & tips) · Groq (chatbot)
+- **AI**: 
+  - **Google Gemini 1.5 Flash** (highly cost-effective and fast image analysis & tips)
+  - **Groq** (AI chatbot assistant)
 - **Weather**: OpenWeatherMap API
 - **Auth**: Google Sign-In + JWT
+- **Design System**:
+  - **Typography**: Plus Jakarta Sans (loaded via `google_fonts`)
+  - **Theme**: Premium Light Mode (background: `#F7F9F4`, cards: `#FFFFFF`)
+  - **Color Palette**:
+    - Primary (Navy): `#143D60`
+    - Secondary (Teal): `#27667B`
+    - Accent (Green): `#A0C878`
+    - Highlight (Light Yellow-Green): `#DDEB9D`
+  - **Visuals**: Flat design with subtle shadows, zero gradients, and consistent card spacing and typography.
 
 ---
 
@@ -33,12 +44,13 @@ flutter pub get
 
 Open `lib/core/constants/api_constants.dart` and fill in your keys:
 
-| Constant | Where to get it |
-|---|---|
-| `geminiApiKey` | [Google AI Studio](https://aistudio.google.com/app/apikey) |
-| `groqApiKey` | [Groq Console](https://console.groq.com/keys) |
-| `owmApiKey` | [OpenWeatherMap](https://openweathermap.org/api) |
-| `googleMapsApiKey` | [Google Cloud Console](https://console.cloud.google.com/google/maps-apis) |
+| Constant | Where to get it | Default / Recommended Model |
+|---|---|---|
+| `geminiApiKey` | [Google AI Studio](https://aistudio.google.com/app/apikey) | - |
+| `geminiModel` | [Google AI Studio](https://aistudio.google.com/app/apikey) | `gemini-1.5-flash` |
+| `groqApiKey` | [Groq Console](https://console.groq.com/keys) | - |
+| `owmApiKey` | [OpenWeatherMap](https://openweathermap.org/api) | - |
+| `googleMapsApiKey` | [Google Cloud Console](https://console.cloud.google.com/google/maps-apis) | - |
 
 Also update `web/index.html` — replace `YOUR_GOOGLE_WEB_CLIENT_ID` with your OAuth Web Client ID.
 
