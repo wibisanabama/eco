@@ -32,10 +32,6 @@ class ProfileAvatar extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColors.surface,
-                border: Border.all(
-                  color: AppColors.primary,
-                  width: 4,
-                ),
                 boxShadow: const [
                   BoxShadow(
                     color: AppColors.shadow,
@@ -47,12 +43,8 @@ class ProfileAvatar extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.divider,
-                      width: 1,
-                    ),
                   ),
                   child: ClipOval(
                     child: isSaving
@@ -82,10 +74,6 @@ class ProfileAvatar extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.surface,
-                    width: 3,
-                  ),
                   boxShadow: const [
                     BoxShadow(
                       color: AppColors.shadow,

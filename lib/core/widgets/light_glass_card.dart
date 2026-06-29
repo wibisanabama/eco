@@ -34,12 +34,6 @@ class LightGlassCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.lightCardBackground,
           borderRadius: BorderRadius.circular(borderRadius),
-          border: Border.all(
-            color: accentBorderColor?.withValues(alpha: 0.2) ??
-                borderColor ??
-                AppColors.border,
-            width: 1,
-          ),
           boxShadow: const [
             BoxShadow(
               color: AppColors.lightShadow,

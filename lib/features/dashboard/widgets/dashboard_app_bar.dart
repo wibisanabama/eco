@@ -143,10 +143,6 @@ class DashboardAppBar extends StatelessWidget {
                       height: 44,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.lightBorder,
-                          width: 2,
-                        ),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.lightShadow,

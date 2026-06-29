@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -187,11 +186,6 @@ class _ProfileViewState extends State<ProfileView> {
                                     },
                                   ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.9, 0.9)),
                                 ),
-                                // Floating Particles
-                                _buildFloatingParticle(left: 80, bottom: 90, size: 4),
-                                _buildFloatingParticle(left: 120, bottom: 120, size: 6),
-                                _buildFloatingParticle(right: 90, bottom: 70, size: 5),
-                                _buildFloatingParticle(right: 140, bottom: 140, size: 8),
                               ],
                             ),
                           ),
@@ -284,35 +278,36 @@ class _ProfileViewState extends State<ProfileView> {
                                   ),
                                 ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
                                 const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildInfoCardWithWatermark(
-                                        padding: const EdgeInsets.all(20),
-                                        child: _buildStatCardContent(
-                                          title: 'Total Scan',
-                                          value: '${profileVM.totalScans}',
-                                          icon: Icons.document_scanner_outlined,
-                                          color: AppColors.lightPrimaryEmerald,
+                                IntrinsicHeight(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildInfoCardWithWatermark(
+                                          padding: const EdgeInsets.all(20),
+                                          child: _buildStatCardContent(
+                                            title: 'Total Scan',
+                                            value: '${profileVM.totalScans}',
+                                            icon: Icons.document_scanner_outlined,
+                                            color: AppColors.lightPrimaryEmerald,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: _buildInfoCardWithWatermark(
-                                        padding: const EdgeInsets.all(20),
-                                        child: _buildStatCardContent(
-                                          title: 'Anggota Sejak',
-                                          value: profileVM.user != null
-                                              ? DateFormatter.formatDate(profileVM.user!.createdAt)
-                                              : '-',
-                                          icon: Icons.calendar_today_outlined,
-                                          color: AppColors.lightAccentEmerald,
-                                          isDate: true,
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: _buildInfoCardWithWatermark(
+                                          padding: const EdgeInsets.all(20),
+                                          child: _buildStatCardContent(
+                                            title: 'Anggota Sejak',
+                                            value: profileVM.user != null
+                                                ? DateFormatter.formatDate(profileVM.user!.createdAt)
+                                                : '-',
+                                            icon: Icons.calendar_today_outlined,
+                                            color: AppColors.lightAccentEmerald,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.05, end: 0),
 
                                 const SizedBox(height: 32),
@@ -396,112 +391,17 @@ class _ProfileViewState extends State<ProfileView> {
 
   /// Master Background System (Parallax/Depth)
   Widget _buildBackgroundArtwork() {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Base color
-        Container(color: AppColors.lightBackground),
-        // Layer 1: Soft radial emerald gradients (Opacity 5%-15%)
-        Positioned(
-          top: 300,
-          right: -100,
-          child: Container(
-            width: 400,
-            height: 400,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primary.withValues(alpha: 0.03),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 100,
-          left: -150,
-          child: Container(
-            width: 500,
-            height: 500,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.accent.withValues(alpha: 0.03),
-            ),
-          ),
-        ),
-        // Layer 2: Blurred Organic Shapes
-        Positioned(
-          top: 400,
-          left: 50,
-          child: Container(
-            width: 200,
-            height: 150,
-            decoration: BoxDecoration(
-              color: AppColors.lightPrimaryEmerald.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(100),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 300,
-          right: 50,
-          child: Container(
-            width: 150,
-            height: 250,
-            decoration: BoxDecoration(
-              color: AppColors.lightAccentEmerald.withValues(alpha: 0.04),
-              borderRadius: BorderRadius.circular(150),
-            ),
-          ),
-        ),
-        // Apply Blur filter for Layer 2 & 1 integration
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-          child: Container(color: Colors.transparent),
-        ),
-        // Layer 3: Environmental illustrations (subtle leaves/watermarks)
-        Positioned(
-          top: 450,
-          right: 30,
-          child: Icon(Icons.park, size: 120, color: AppColors.lightPrimaryEmerald.withValues(alpha: 0.02)),
-        ),
-        Positioned(
-          bottom: 200,
-          left: 20,
-          child: Icon(Icons.water, size: 180, color: AppColors.lightAccentEmerald.withValues(alpha: 0.03)),
-        ),
-        Positioned(
-          bottom: 50,
-          right: 80,
-          child: Icon(Icons.eco, size: 80, color: AppColors.lightPrimaryEmerald.withValues(alpha: 0.02)),
-        ),
-      ],
+    return Container(
+      color: AppColors.lightBackground,
     );
   }
 
-  Widget _buildFloatingParticle({double? top, double? bottom, double? left, double? right, required double size}) {
-    return Positioned(
-      top: top,
-      bottom: bottom,
-      left: left,
-      right: right,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.4),
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(color: Colors.white.withValues(alpha: 0.6), blurRadius: 4, spreadRadius: 1),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildInfoCardWithWatermark({required Widget child, EdgeInsets padding = const EdgeInsets.all(24)}) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.lightCardBackground,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.lightBorder),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
             color: AppColors.lightShadow,
@@ -635,7 +535,6 @@ class _ProfileViewState extends State<ProfileView> {
           decoration: BoxDecoration(
             color: AppColors.lightBackground,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.lightBorder),
           ),
           child: Row(
             children: [
@@ -663,7 +562,6 @@ class _ProfileViewState extends State<ProfileView> {
     required String value,
     required IconData icon,
     required Color color,
-    bool isDate = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -679,11 +577,11 @@ class _ProfileViewState extends State<ProfileView> {
         const SizedBox(height: 16),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.lightTextPrimary,
-            fontSize: isDate ? 16 : 24,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
-            letterSpacing: -0.5,
+            letterSpacing: -0.3,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

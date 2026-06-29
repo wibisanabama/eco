@@ -68,10 +68,6 @@ class WaterQualityCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: _statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: _statusColor.withValues(alpha: 0.25),
-                    width: 1,
-                  ),
                 ),
                 child: Text(
                   waterQuality.status,
@@ -157,10 +153,6 @@ class WaterQualityCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.lightBackground,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.lightBorder,
-                width: 1,
-              ),
             ),
             child: Row(
               children: [

@@ -75,10 +75,6 @@ class _SafeStateCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.lightSignalSafe.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.lightSignalSafe.withValues(alpha: 0.25),
-                    width: 1,
-                  ),
                 ),
                 child: Text(
                   AppStrings.levelSafe,
@@ -105,10 +101,6 @@ class _SafeStateCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.lightSignalSafe.withValues(alpha: 0.08),
-                    border: Border.all(
-                      color: AppColors.lightSignalSafe.withValues(alpha: 0.15),
-                      width: 2,
-                    ),
                   ),
                   child: Icon(
                     Icons.check_circle_outline_rounded,
@@ -198,10 +190,6 @@ class _SignalCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: _signalColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: _signalColor.withValues(alpha: 0.25),
-                    width: 1,
-                  ),
                 ),
                 child: Text(
                   signal.level,
@@ -228,10 +216,6 @@ class _SignalCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: _signalColor.withValues(alpha: 0.08),
-                    border: Border.all(
-                      color: _signalColor.withValues(alpha: 0.15),
-                      width: 2,
-                    ),
                     boxShadow: [
                       BoxShadow(
                         color: _signalColor.withValues(alpha: 0.12),
@@ -281,10 +265,6 @@ class _SignalCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: _signalColor.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: _signalColor.withValues(alpha: 0.1),
-                width: 1,
-              ),
             ),
             child: Row(
               children: [

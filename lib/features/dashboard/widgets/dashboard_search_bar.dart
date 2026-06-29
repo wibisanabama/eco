@@ -29,7 +29,6 @@ class DashboardSearchBar extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.lightCardBackground,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.lightBorder),
             boxShadow: const [
               BoxShadow(
                 color: AppColors.lightShadow,
@@ -99,7 +98,6 @@ class DashboardSearchBar extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.lightCardBackground,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.lightBorder),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.lightShadow,
@@ -148,12 +146,9 @@ void showFilterBottomSheet(BuildContext context) {
     builder: (context) {
       return Container(
         padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.lightBackground,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border(
-            top: BorderSide(color: AppColors.lightBorder),
-          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -224,7 +219,6 @@ class _FilterChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.lightCardBackground,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.lightBorder),
         boxShadow: [
           BoxShadow(
             color: AppColors.lightShadow.withValues(alpha: 0.05),
