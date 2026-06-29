@@ -357,73 +357,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
-
-                // Custom Tab Selector (Masuk | Daftar)
-                Container(
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _activeAuthTab = 0;
-                              authVM.clearError();
-                            });
-                          },
-                          behavior: HitTestBehavior.opaque,
-                          child: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: _activeAuthTab == 0 ? AppColors.primary : Colors.transparent,
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: Text(
-                              'Masuk',
-                              style: TextStyle(
-                                color: _activeAuthTab == 0 ? Colors.white : AppColors.textSecondary,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _activeAuthTab = 1;
-                              authVM.clearError();
-                            });
-                          },
-                          behavior: HitTestBehavior.opaque,
-                          child: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: _activeAuthTab == 1 ? AppColors.primary : Colors.transparent,
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: Text(
-                              'Daftar',
-                              style: TextStyle(
-                                color: _activeAuthTab == 1 ? Colors.white : AppColors.textSecondary,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
 
                 // Active Form
                 AnimatedSwitcher(
@@ -520,6 +454,24 @@ class _WelcomeViewState extends State<WelcomeView> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _activeAuthTab = 1;
+                authVM.clearError();
+              });
+            },
+            child: const Text(
+              'Belum punya akun? Daftar Sekarang',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
             ),
           ),
         ],
@@ -677,6 +629,24 @@ class _WelcomeViewState extends State<WelcomeView> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _activeAuthTab = 0;
+                authVM.clearError();
+              });
+            },
+            child: const Text(
+              'Sudah punya akun? Login Sekarang',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
             ),
           ),
         ],
