@@ -55,10 +55,6 @@ class WeatherCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.lightPrimaryEmerald.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.lightBorder,
-                    width: 1,
-                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -167,10 +163,6 @@ class WeatherCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.lightBackground,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.lightBorder,
-                width: 1,
-              ),
             ),
             child: Row(
               children: [

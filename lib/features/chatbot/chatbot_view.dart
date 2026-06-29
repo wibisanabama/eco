@@ -234,10 +234,6 @@ class _ScanContextHeader extends StatelessWidget {
             offset: const Offset(0, 6),
           ),
         ],
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.15),
-          width: 1,
-        ),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),

@@ -76,11 +76,6 @@ class _Chip extends StatelessWidget {
               ? AppColors.lightPrimaryEmerald
               : AppColors.lightCardBackground,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected
-                ? AppColors.lightPrimaryEmerald
-                : AppColors.lightBorder,
-          ),
           boxShadow: isSelected
               ? [
                   BoxShadow(

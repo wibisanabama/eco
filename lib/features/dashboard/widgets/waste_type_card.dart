@@ -69,10 +69,6 @@ class WasteTypeCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.lightPrimaryEmerald.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.lightBorder,
-                    width: 1,
-                  ),
                 ),
                 child: Text(
                   '${wasteType.dominantType} ${wasteType.percentage}%',

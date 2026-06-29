@@ -168,7 +168,7 @@ class _DashboardViewState extends State<DashboardView> {
                     ],
                   ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.05, end: 0),
 
-                  const SizedBox(height: 100), // extra padding for floating navigation bar
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
@@ -185,7 +185,6 @@ class _DashboardViewState extends State<DashboardView> {
       decoration: BoxDecoration(
         color: AppColors.lightCardBackground,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
         boxShadow: const [
           BoxShadow(
             color: AppColors.lightShadow,

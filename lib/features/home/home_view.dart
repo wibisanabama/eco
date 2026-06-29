@@ -20,7 +20,6 @@ class HomeView extends StatelessWidget {
         builder: (context, homeVM, child) {
           return Scaffold(
             backgroundColor: AppColors.background,
-            extendBody: true, // Allow content to flow under the floating bottom bar
             body: IndexedStack(
               index: homeVM.currentIndex,
               children: const [
@@ -29,20 +28,15 @@ class HomeView extends StatelessWidget {
                 HistoryView(),
               ],
             ),
-            bottomNavigationBar: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                child: _FloatingBottomBar(
-                  currentIndex: homeVM.currentIndex,
-                  onTap: (index) {
-                    HapticFeedback.mediumImpact();
-                    homeVM.setIndex(index);
-                    if (index == 2) {
-                      context.read<HistoryViewModel>().loadHistory();
-                    }
-                  },
-                ),
-              ),
+            bottomNavigationBar: _AnchoredBottomBar(
+              currentIndex: homeVM.currentIndex,
+              onTap: (index) {
+                HapticFeedback.mediumImpact();
+                homeVM.setIndex(index);
+                if (index == 2) {
+                  context.read<HistoryViewModel>().loadHistory();
+                }
+              },
             ),
           );
         },
@@ -51,11 +45,13 @@ class HomeView extends StatelessWidget {
   }
 }
 
-class _FloatingBottomBar extends StatelessWidget {
+/// Standard anchored bottom navigation bar — NOT floating.
+/// Flush against screen edges with only top-left and top-right rounded corners.
+class _AnchoredBottomBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  const _FloatingBottomBar({
+  const _AnchoredBottomBar({
     required this.currentIndex,
     required this.onTap,
   });
@@ -63,46 +59,46 @@ class _FloatingBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 72,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.primary,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // Dashboard Tab
-          _NavBarItem(
-            icon: Icons.dashboard_outlined,
-            activeIcon: Icons.dashboard,
-            label: AppStrings.dashboard,
-            isSelected: currentIndex == 0,
-            onTap: () => onTap(0),
-          ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // Dashboard Tab
+              _NavBarItem(
+                icon: Icons.dashboard_outlined,
+                activeIcon: Icons.dashboard,
+                label: AppStrings.dashboard,
+                isSelected: currentIndex == 0,
+                onTap: () => onTap(0),
+              ),
 
-          // Camera Tab (Floating Center Button)
-          _CameraFloatingButton(
-            isSelected: currentIndex == 1,
-            onTap: () => onTap(1),
-          ),
+              // Camera Tab (Center Button)
+              _CameraCenterButton(
+                isSelected: currentIndex == 1,
+                onTap: () => onTap(1),
+              ),
 
-          // History Tab
-          _NavBarItem(
-            icon: Icons.history_outlined,
-            activeIcon: Icons.history,
-            label: AppStrings.history,
-            isSelected: currentIndex == 2,
-            onTap: () => onTap(2),
+              // History Tab
+              _NavBarItem(
+                icon: Icons.history_outlined,
+                activeIcon: Icons.history,
+                label: AppStrings.history,
+                isSelected: currentIndex == 2,
+                onTap: () => onTap(2),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -128,44 +124,37 @@ class _NavBarItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? Colors.white.withValues(alpha: 0.2)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
+      child: SizedBox(
+        width: 72,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
               isSelected ? activeIcon : icon,
-              color: isSelected ? Colors.white : Colors.white70,
+              color: isSelected ? Colors.white : Colors.white60,
               size: 24,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white70,
-              fontSize: 10,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.white60,
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class _CameraFloatingButton extends StatelessWidget {
+class _CameraCenterButton extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _CameraFloatingButton({
+  const _CameraCenterButton({
     required this.isSelected,
     required this.onTap,
   });
@@ -175,28 +164,16 @@ class _CameraFloatingButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 58,
-        height: 58,
+        width: 50,
+        height: 50,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: AppColors.accent,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.accent.withValues(alpha: isSelected ? 0.5 : 0.25),
-              blurRadius: isSelected ? 20 : 12,
-              spreadRadius: isSelected ? 4 : 1,
-              offset: const Offset(0, 4),
-            ),
-          ],
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.4),
-            width: 2,
-          ),
         ),
         child: const Icon(
           Icons.camera_alt,
           color: Colors.white,
-          size: 28,
+          size: 24,
         ),
       ),
     );

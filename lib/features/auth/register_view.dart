@@ -70,9 +70,7 @@ class _RegisterViewState extends State<RegisterView>
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: AppColors.splashGradient,
-        ),
+        color: AppColors.primary,
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -85,7 +83,7 @@ class _RegisterViewState extends State<RegisterView>
                     children: [
                       const SizedBox(height: 24),
 
-                      // ── Back Button ────────────────────────────────
+                      // ── Back Button — no border ────────────────
                       Align(
                         alignment: Alignment.centerLeft,
                         child: GestureDetector(
@@ -95,9 +93,6 @@ class _RegisterViewState extends State<RegisterView>
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.2),
-                              ),
                             ),
                             child: const Icon(
                               Icons.arrow_back_ios_new,
@@ -130,15 +125,12 @@ class _RegisterViewState extends State<RegisterView>
 
                       const SizedBox(height: 28),
 
-                      // ── Register Card ─────────────────────────────
+                      // ── Register Card — no border ─────────────────
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                          ),
                         ),
                         child: Form(
                           key: _formKey,
@@ -246,9 +238,6 @@ class _RegisterViewState extends State<RegisterView>
                                   decoration: BoxDecoration(
                                     color: AppColors.error.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                        color:
-                                            AppColors.error.withValues(alpha: 0.5)),
                                   ),
                                   child: Row(
                                     children: [
@@ -374,11 +363,11 @@ class _RegisterViewState extends State<RegisterView>
         fillColor: Colors.white.withValues(alpha: 0.1),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

@@ -58,10 +58,6 @@ class AqiCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: statusColor.withValues(alpha: 0.25),
-                    width: 1,
-                  ),
                 ),
                 child: Text(
                   aqi.label,
@@ -130,10 +126,6 @@ class AqiCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.lightBackground,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.lightBorder,
-                width: 1,
-              ),
             ),
             child: Row(
               children: [

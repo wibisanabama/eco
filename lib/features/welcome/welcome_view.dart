@@ -5,7 +5,6 @@ import 'package:eco/core/constants/app_strings.dart';
 import 'package:eco/features/auth/auth_viewmodel.dart';
 import 'package:eco/features/splash/splash_view.dart'
     show heroIconSize, heroIconPad, heroIconRadius, heroFontSize, heroIconTextGap;
-import 'package:eco/features/splash/widgets/scan_illustration.dart';
 
 class WelcomeView extends StatefulWidget {
   const WelcomeView({super.key});
@@ -19,12 +18,8 @@ class _WelcomeViewState extends State<WelcomeView>
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  // Semua animasi pakai easeOutExpo, durasi ~520ms agar sinkron dengan Hero flight
   late final AnimationController _sheetController;
   late final Animation<Offset> _sheetSlide;
-
-  late final AnimationController _taglineController;
-  late final Animation<Offset> _taglineSlide;
 
   // Login form
   final _usernameCtrl = TextEditingController();
@@ -37,7 +32,6 @@ class _WelcomeViewState extends State<WelcomeView>
   void initState() {
     super.initState();
 
-    // Sheet: easeOutExpo 600ms
     _sheetController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -50,24 +44,9 @@ class _WelcomeViewState extends State<WelcomeView>
       curve: Curves.easeOutExpo,
     ));
 
-    // Tagline: easeOutExpo 520ms — sinkron dengan Hero flight (transitionDuration 520ms)
-    _taglineController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 520),
-    );
-    _taglineSlide = Tween<Offset>(
-      begin: const Offset(0, 0.14),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _taglineController,
-      curve: Curves.easeOutExpo,
-    ));
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Langsung mulai saat frame pertama — tanpa delay tambahan
       if (mounted) {
         _sheetController.forward();
-        _taglineController.forward();
       }
 
       final authVM = context.read<AuthViewModel>();
@@ -88,7 +67,6 @@ class _WelcomeViewState extends State<WelcomeView>
   void dispose() {
     _pageController.dispose();
     _sheetController.dispose();
-    _taglineController.dispose();
     _usernameCtrl.dispose();
     _passCtrl.dispose();
     _authVM?.removeListener(_onAuthChanged);
@@ -107,7 +85,7 @@ class _WelcomeViewState extends State<WelcomeView>
     final double sw = size.width;
     final double sh = size.height;
 
-    // Hero tokens — IDENTIK dengan SplashView
+    // Hero tokens — IDENTICAL to SplashView
     final double iconSz = heroIconSize(sw);
     final double iconPad = heroIconPad(sw);
     final double iconRadius = heroIconRadius(sw);
@@ -116,15 +94,11 @@ class _WelcomeViewState extends State<WelcomeView>
 
     // Layout
     final double hPad = (sw * 0.072).clamp(20.0, 40.0);
-    final double illHeroGap = (sh * 0.028).clamp(16.0, 36.0);
-    final double heroTaglineGap = (sh * 0.012).clamp(8.0, 16.0);
-    final double taglineFontSz = (sw * 0.030).clamp(11.0, 13.5);
-    final double taglineHPad = (sw * 0.08).clamp(16.0, 60.0);
 
     final double ar = sh / sw;
-    final double cardTopRatio = ar > 1.9 ? 0.54 : ar > 1.6 ? 0.51 : 0.47;
-    final double cardTop = (sh * cardTopRatio).clamp(260.0, sh * 0.61);
-    final double cardRadius = (sw * 0.082).clamp(26.0, 40.0);
+    final double cardTopRatio = ar > 1.9 ? 0.42 : ar > 1.6 ? 0.39 : 0.36;
+    final double cardTop = (sh * cardTopRatio).clamp(220.0, sh * 0.48);
+    final double cardRadius = (sw * 0.065).clamp(22.0, 32.0);
 
     final double sheetTopPad = (sh * 0.020).clamp(10.0, 22.0);
     final double indicatorBotPad = (sh * 0.014).clamp(8.0, 18.0);
@@ -143,15 +117,14 @@ class _WelcomeViewState extends State<WelcomeView>
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
+          // Background
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-            ),
+            color: AppColors.primary,
           ),
 
-          /// LAYER 2 — Illustration + Hero (dibatasi di area atas card)
+          // Top section — Logo + App Name
           Positioned(
             top: 0,
             left: 0,
@@ -159,119 +132,45 @@ class _WelcomeViewState extends State<WelcomeView>
             height: cardTop,
             child: SafeArea(
               bottom: false,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: hPad),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Spacer(flex: 2),
-
-                    // Illustration - collapses on page 1 (login) to avoid overflow
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 350),
-                      curve: Curves.easeInOut,
-                      height: _currentPage == 0 ? (sh * 0.16).clamp(110.0, 160.0) : 0,
-                      child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 250),
-                        opacity: _currentPage == 0 ? 1.0 : 0.0,
-                        child: _currentPage == 0
-                            ? const FittedBox(
-                                fit: BoxFit.contain,
-                                child: Hero(
-                                  tag: 'scan_illustration',
-                                  child: ScanIllustration(),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                    ),
-
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 350),
-                      curve: Curves.easeInOut,
-                      height: _currentPage == 0 ? illHeroGap : 0,
-                      child: const SizedBox.shrink(),
-                    ),
-
-                    // Logo + VibEco (2 baris, identik splash)
-                    Hero(
-                      tag: 'app_name',
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(iconPad * (_currentPage == 0 ? 1.0 : 0.7)),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(iconRadius),
-                              ),
-                              child: Icon(
-                                Icons.eco,
-                                color: Colors.white,
-                                size: iconSz * (_currentPage == 0 ? 1.0 : 0.75),
-                              ),
-                            ),
-                            SizedBox(height: iconTextGap * (_currentPage == 0 ? 1.0 : 0.5)),
-                            Text(
-                              AppStrings.appName,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: nameFontSz * (_currentPage == 0 ? 1.0 : 0.85),
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.3,
-                              ),
-                            ),
-                          ],
+              child: Center(
+                child: Hero(
+                  tag: 'app_name',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(iconPad),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(iconRadius),
+                          ),
+                          child: Icon(
+                            Icons.eco,
+                            color: Colors.white,
+                            size: iconSz,
+                          ),
                         ),
-                      ),
+                        SizedBox(height: iconTextGap),
+                        Text(
+                          AppStrings.appName,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: nameFontSz,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
                     ),
-
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 350),
-                      curve: Curves.easeInOut,
-                      height: _currentPage == 0 ? heroTaglineGap : 0,
-                      child: const SizedBox.shrink(),
-                    ),
-
-                    // Tagline — slide in sinkron dengan Hero flight (520ms easeOutExpo)
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 350),
-                      curve: Curves.easeInOut,
-                      height: _currentPage == 0 ? (sh * 0.05).clamp(24.0, 40.0) : 0,
-                      child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 250),
-                        opacity: _currentPage == 0 ? 1.0 : 0.0,
-                        child: _currentPage == 0
-                            ? SlideTransition(
-                                position: _taglineSlide,
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: taglineHPad),
-                                  child: Text(
-                                    AppStrings.appTagline,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: taglineFontSz,
-                                      color: Colors.white.withValues(alpha: 0.60),
-                                      letterSpacing: 0.2,
-                                      height: 1.45,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                    ),
-
-                    const Spacer(flex: 2),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
 
-          /// LAYER 3 — White card, slide UP easeOutExpo
+          // White card sheet
           Positioned(
             left: 0,
             right: 0,
@@ -281,18 +180,11 @@ class _WelcomeViewState extends State<WelcomeView>
               position: _sheetSlide,
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(cardRadius),
                     topRight: Radius.circular(cardRadius),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.18),
-                      blurRadius: 28,
-                      offset: const Offset(0, -6),
-                    ),
-                  ],
                 ),
                 child: SafeArea(
                   top: false,
@@ -379,7 +271,7 @@ class _WelcomeViewState extends State<WelcomeView>
     );
   }
 
-  // ─── HALAMAN 1: WELCOME ───────────────────────────────────────
+  // ─── PAGE 1: WELCOME ───────────────────────────────────────
   Widget _buildWelcomePage({
     required double hPad,
     required double titleFontSz,
@@ -439,10 +331,10 @@ class _WelcomeViewState extends State<WelcomeView>
                 curve: Curves.easeInOutCubic,
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.emerald,
+                backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.onPrimary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(btnHeight / 2),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 elevation: 0,
               ),
@@ -468,7 +360,7 @@ class _WelcomeViewState extends State<WelcomeView>
     );
   }
 
-  // ─── HALAMAN 2: LOGIN / DAFTAR ────────────────────────────────
+  // ─── PAGE 2: LOGIN ────────────────────────────────────
   Widget _buildLoginPage({
     required double hPad,
     required double titleFontSz,
@@ -590,20 +482,20 @@ class _WelcomeViewState extends State<WelcomeView>
                 SizedBox(height: vGapSm),
               ],
 
-              // Tombol utama
+              // Login button
               SizedBox(
                 height: btnHeight,
                 child: ElevatedButton(
                   onPressed: authVM.isLoading ? null : () => _submit(authVM),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.emerald,
+                    backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.onPrimary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(btnHeight / 2),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     elevation: 0,
                     disabledBackgroundColor:
-                        AppColors.emerald.withValues(alpha: 0.55),
+                        AppColors.primary.withValues(alpha: 0.55),
                   ),
                   child: authVM.isLoading
                       ? SizedBox(
@@ -658,7 +550,6 @@ class _WelcomeViewState extends State<WelcomeView>
     final pass = _passCtrl.text;
 
     if (username.isEmpty || pass.isEmpty) {
-      // Minimal validation
       return;
     }
 
@@ -696,25 +587,18 @@ class _WelcomeViewState extends State<WelcomeView>
         ),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: AppColors.onSurface.withValues(alpha: 0.04),
+        fillColor: AppColors.surfaceVariant,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(
-            color: AppColors.onSurface.withValues(alpha: 0.10),
-          ),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(
-            color: AppColors.onSurface.withValues(alpha: 0.10),
-          ),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(
-            color: AppColors.primary.withValues(alpha: 0.70),
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
