@@ -278,35 +278,36 @@ class _ProfileViewState extends State<ProfileView> {
                                   ),
                                 ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
                                 const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildInfoCardWithWatermark(
-                                        padding: const EdgeInsets.all(20),
-                                        child: _buildStatCardContent(
-                                          title: 'Total Scan',
-                                          value: '${profileVM.totalScans}',
-                                          icon: Icons.document_scanner_outlined,
-                                          color: AppColors.lightPrimaryEmerald,
+                                IntrinsicHeight(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildInfoCardWithWatermark(
+                                          padding: const EdgeInsets.all(20),
+                                          child: _buildStatCardContent(
+                                            title: 'Total Scan',
+                                            value: '${profileVM.totalScans}',
+                                            icon: Icons.document_scanner_outlined,
+                                            color: AppColors.lightPrimaryEmerald,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: _buildInfoCardWithWatermark(
-                                        padding: const EdgeInsets.all(20),
-                                        child: _buildStatCardContent(
-                                          title: 'Anggota Sejak',
-                                          value: profileVM.user != null
-                                              ? DateFormatter.formatDate(profileVM.user!.createdAt)
-                                              : '-',
-                                          icon: Icons.calendar_today_outlined,
-                                          color: AppColors.lightAccentEmerald,
-                                          isDate: true,
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: _buildInfoCardWithWatermark(
+                                          padding: const EdgeInsets.all(20),
+                                          child: _buildStatCardContent(
+                                            title: 'Anggota Sejak',
+                                            value: profileVM.user != null
+                                                ? DateFormatter.formatDate(profileVM.user!.createdAt)
+                                                : '-',
+                                            icon: Icons.calendar_today_outlined,
+                                            color: AppColors.lightAccentEmerald,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.05, end: 0),
 
                                 const SizedBox(height: 32),
@@ -561,7 +562,6 @@ class _ProfileViewState extends State<ProfileView> {
     required String value,
     required IconData icon,
     required Color color,
-    bool isDate = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -577,11 +577,11 @@ class _ProfileViewState extends State<ProfileView> {
         const SizedBox(height: 16),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.lightTextPrimary,
-            fontSize: isDate ? 16 : 24,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
-            letterSpacing: -0.5,
+            letterSpacing: -0.3,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
