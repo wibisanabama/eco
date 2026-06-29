@@ -70,32 +70,35 @@ class _AnchoredBottomBar extends StatelessWidget {
           ),
           child: SafeArea(
             top: false,
-            child: SizedBox(
-              height: 64,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Home Tab
-                  _NavBarItem(
-                    icon: Icons.home_outlined,
-                    activeIcon: Icons.home,
-                    label: 'Home',
-                    isSelected: currentIndex == 0,
-                    onTap: () => onTap(0),
-                  ),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 12), // Add spacing from the phone's home button
+              child: SizedBox(
+                height: 68,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Home Tab
+                    _NavBarItem(
+                      icon: Icons.home_outlined,
+                      activeIcon: Icons.home_outlined,
+                      label: 'Home',
+                      isSelected: currentIndex == 0,
+                      onTap: () => onTap(0),
+                    ),
 
-                  // Placeholder for the floating center button
-                  const SizedBox(width: 72),
+                    // Placeholder for the floating center button
+                    const SizedBox(width: 80),
 
-                  // History Tab
-                  _NavBarItem(
-                    icon: Icons.history_outlined,
-                    activeIcon: Icons.history,
-                    label: 'Riwayat',
-                    isSelected: currentIndex == 2,
-                    onTap: () => onTap(2),
-                  ),
-                ],
+                    // History Tab
+                    _NavBarItem(
+                      icon: Icons.history_outlined,
+                      activeIcon: Icons.history_outlined,
+                      label: 'Riwayat',
+                      isSelected: currentIndex == 2,
+                      onTap: () => onTap(2),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -103,7 +106,7 @@ class _AnchoredBottomBar extends StatelessWidget {
 
         // Floating Center Camera Button
         Positioned(
-          top: -24,
+          top: -30, // Positioned half-in, half-out of the taller navbar
           left: 0,
           right: 0,
           child: Center(
@@ -178,27 +181,69 @@ class _CameraCenterButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
+        width: 68,
+        height: 68,
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white,
-          border: Border.all(
-            color: isSelected ? AppColors.accent : AppColors.primary,
-            width: 4,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+          color: Colors.transparent,
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Outer Ring (Soft white/green outer ring)
+            Container(
+              width: 68,
+              height: 68,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                border: Border.all(
+                  color: isSelected ? AppColors.accent : Colors.white.withValues(alpha: 0.6),
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+            ),
+            // Inner Button (White background, green border)
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                border: Border.all(
+                  color: AppColors.primary,
+                  width: 2.5,
+                ),
+              ),
+              child: const Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(
+                      Icons.sync,
+                      color: AppColors.primary,
+                      size: 28,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 2),
+                      child: Icon(
+                        Icons.eco,
+                        color: AppColors.primary,
+                        size: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
-        ),
-        child: Icon(
-          Icons.camera_alt_rounded,
-          color: isSelected ? AppColors.accent : AppColors.primary,
-          size: 28,
         ),
       ),
     );
