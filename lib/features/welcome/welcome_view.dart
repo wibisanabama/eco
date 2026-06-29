@@ -3,52 +3,55 @@ import 'package:provider/provider.dart';
 import 'package:eco/core/constants/app_colors.dart';
 import 'package:eco/core/constants/app_strings.dart';
 import 'package:eco/features/auth/auth_viewmodel.dart';
-import 'package:eco/features/splash/splash_view.dart'
-    show heroIconSize, heroIconPad, heroIconRadius, heroFontSize, heroIconTextGap;
+
 
 class WelcomeView extends StatefulWidget {
-  const WelcomeView({super.key});
+  final int initialPage;
+  final int initialAuthTab;
+
+  const WelcomeView({
+    super.key,
+    this.initialPage = 0,
+    this.initialAuthTab = 0,
+  });
 
   @override
   State<WelcomeView> createState() => _WelcomeViewState();
 }
 
-class _WelcomeViewState extends State<WelcomeView>
-    with TickerProviderStateMixin {
-  final PageController _pageController = PageController();
+class _WelcomeViewState extends State<WelcomeView> {
+  late final PageController _pageController;
   int _currentPage = 0;
 
-  late final AnimationController _sheetController;
-  late final Animation<Offset> _sheetSlide;
+  // Tab state for Auth Page (0 = Login, 1 = Register)
+  int _activeAuthTab = 0;
 
-  // Login form
-  final _usernameCtrl = TextEditingController();
-  final _passCtrl = TextEditingController();
-  bool _obscurePass = true;
+  // Controllers
+  final _loginUsernameCtrl = TextEditingController();
+  final _loginPassCtrl = TextEditingController();
+  bool _obscureLoginPass = true;
+
+  final _regNameCtrl = TextEditingController();
+  final _regUsernameCtrl = TextEditingController();
+  final _regEmailCtrl = TextEditingController();
+  final _regPassCtrl = TextEditingController();
+  final _regConfirmPassCtrl = TextEditingController();
+  bool _obscureRegPass = true;
+  bool _obscureRegConfirm = true;
+
+  final _formKeyLogin = GlobalKey<FormState>();
+  final _formKeyRegister = GlobalKey<FormState>();
 
   AuthViewModel? _authVM;
 
   @override
   void initState() {
     super.initState();
-
-    _sheetController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _sheetSlide = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _sheetController,
-      curve: Curves.easeOutExpo,
-    ));
+    _currentPage = widget.initialPage;
+    _activeAuthTab = widget.initialAuthTab;
+    _pageController = PageController(initialPage: widget.initialPage);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _sheetController.forward();
-      }
-
       final authVM = context.read<AuthViewModel>();
       _authVM = authVM..addListener(_onAuthChanged);
       authVM.initialize();
@@ -66,568 +69,755 @@ class _WelcomeViewState extends State<WelcomeView>
   @override
   void dispose() {
     _pageController.dispose();
-    _sheetController.dispose();
-    _usernameCtrl.dispose();
-    _passCtrl.dispose();
+    _loginUsernameCtrl.dispose();
+    _loginPassCtrl.dispose();
+    _regNameCtrl.dispose();
+    _regUsernameCtrl.dispose();
+    _regEmailCtrl.dispose();
+    _regPassCtrl.dispose();
+    _regConfirmPassCtrl.dispose();
     _authVM?.removeListener(_onAuthChanged);
     super.dispose();
   }
 
-  void _goBack() => _pageController.animateToPage(
-        0,
+  void _nextPage() {
+    if (_currentPage < 3) {
+      _pageController.animateToPage(
+        _currentPage + 1,
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOutCubic,
       );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final double sw = size.width;
-    final double sh = size.height;
-
-    // Hero tokens — IDENTICAL to SplashView
-    final double iconSz = heroIconSize(sw);
-    final double iconPad = heroIconPad(sw);
-    final double iconRadius = heroIconRadius(sw);
-    final double nameFontSz = heroFontSize(sw);
-    final double iconTextGap = heroIconTextGap(sw);
-
-    // Layout
-    final double hPad = (sw * 0.072).clamp(20.0, 40.0);
-
-    final double ar = sh / sw;
-    final double cardTopRatio = ar > 1.9 ? 0.42 : ar > 1.6 ? 0.39 : 0.36;
-    final double cardTop = (sh * cardTopRatio).clamp(220.0, sh * 0.48);
-    final double cardRadius = (sw * 0.065).clamp(22.0, 32.0);
-
-    final double sheetTopPad = (sh * 0.020).clamp(10.0, 22.0);
-    final double indicatorBotPad = (sh * 0.014).clamp(8.0, 18.0);
-
-    // Content tokens
-    final double titleFontSz = (sw * 0.057).clamp(18.0, 26.0);
-    final double subtitleFontSz = (sw * 0.034).clamp(12.0, 15.0);
-    final double chipFontSz = (sw * 0.031).clamp(11.0, 14.0);
-    final double btnHeight = (sh * 0.068).clamp(50.0, 62.0);
-    final double btnFontSz = (sw * 0.042).clamp(14.0, 18.0);
-    final double vGapSm = (sh * 0.013).clamp(8.0, 16.0);
-    final double vGapMd = (sh * 0.024).clamp(14.0, 28.0);
-    final double vGapLg = (sh * 0.030).clamp(18.0, 36.0);
-
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: Stack(
+      backgroundColor: _currentPage == 0 ? AppColors.primary : AppColors.background,
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(), // Disable swipe, button-only navigation
+        onPageChanged: (page) {
+          setState(() {
+            _currentPage = page;
+          });
+        },
         children: [
-          // Background
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: AppColors.primary,
-          ),
-
-          // Top section — Logo + App Name
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: cardTop,
-            child: SafeArea(
-              bottom: false,
-              child: Center(
-                child: Hero(
-                  tag: 'app_name',
-                  child: Material(
-                    color: Colors.transparent,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(iconPad),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(iconRadius),
-                          ),
-                          child: Icon(
-                            Icons.eco,
-                            color: Colors.white,
-                            size: iconSz,
-                          ),
-                        ),
-                        SizedBox(height: iconTextGap),
-                        Text(
-                          AppStrings.appName,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: nameFontSz,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // White card sheet
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            top: cardTop,
-            child: SlideTransition(
-              position: _sheetSlide,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(cardRadius),
-                    topRight: Radius.circular(cardRadius),
-                  ),
-                ),
-                child: SafeArea(
-                  top: false,
-                  child: Column(
-                    children: [
-                      SizedBox(height: sheetTopPad),
-
-                      // Dot indicator
-                      AnimatedBuilder(
-                        animation: _pageController,
-                        builder: (context, _) {
-                          final double page = _pageController.hasClients
-                              ? (_pageController.page ?? _currentPage.toDouble())
-                              : _currentPage.toDouble();
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _dot(index: 0, page: page, sw: sw),
-                              _dot(index: 1, page: page, sw: sw),
-                            ],
-                          );
-                        },
-                      ),
-
-                      SizedBox(height: indicatorBotPad),
-
-                      Expanded(
-                        child: PageView(
-                          controller: _pageController,
-                          onPageChanged: (i) =>
-                              setState(() => _currentPage = i),
-                          children: [
-                            _buildWelcomePage(
-                              hPad: hPad,
-                              titleFontSz: titleFontSz,
-                              subtitleFontSz: subtitleFontSz,
-                              chipFontSz: chipFontSz,
-                              btnHeight: btnHeight,
-                              btnFontSz: btnFontSz,
-                              vGapSm: vGapSm,
-                              vGapMd: vGapMd,
-                              vGapLg: vGapLg,
-                            ),
-                            _buildLoginPage(
-                              hPad: hPad,
-                              titleFontSz: titleFontSz,
-                              subtitleFontSz: subtitleFontSz,
-                              btnHeight: btnHeight,
-                              btnFontSz: btnFontSz,
-                              vGapSm: vGapSm,
-                              vGapMd: vGapMd,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+          _buildStartPage(),
+          _buildOnboardingPage1(),
+          _buildOnboardingPage2(),
+          _buildAuthPage(),
         ],
       ),
     );
   }
 
-  Widget _dot({required int index, required double page, required double sw}) {
-    final double t = (1 - (page - index).abs()).clamp(0.0, 1.0);
-    final double maxW = (sw * 0.072).clamp(20.0, 30.0);
-    final double minW = (sw * 0.020).clamp(6.0, 9.0);
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 120),
-      margin: const EdgeInsets.symmetric(horizontal: 3),
-      width: minW + (maxW - minW) * t,
-      height: 5,
-      decoration: BoxDecoration(
-        color: Color.lerp(
-          AppColors.onSurface.withValues(alpha: 0.15),
-          AppColors.onSurface.withValues(alpha: 0.85),
-          t,
+  // ─── PAGE 0: START PAGE ("SAVE THE PLANET") ──────────────────────────────────
+  Widget _buildStartPage() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        child: Column(
+          children: [
+            const Spacer(),
+            // Leaf Icon
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.eco_rounded,
+                color: Colors.white,
+                size: 64,
+              ),
+            ),
+            const SizedBox(height: 32),
+            // Title
+            const Text(
+              'SAVE\nTHE\nPLANET',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 48,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 4,
+                height: 1.1,
+              ),
+            ),
+            const Spacer(),
+            // Start Button
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: _nextPage,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Start',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-        borderRadius: BorderRadius.circular(10),
       ),
     );
   }
 
-  // ─── PAGE 1: WELCOME ───────────────────────────────────────
-  Widget _buildWelcomePage({
-    required double hPad,
-    required double titleFontSz,
-    required double subtitleFontSz,
-    required double chipFontSz,
-    required double btnHeight,
-    required double btnFontSz,
-    required double vGapSm,
-    required double vGapMd,
-    required double vGapLg,
-  }) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(hPad, vGapSm, hPad, vGapMd),
-      child: Column(
-        children: [
-          Text(
-            'Kenali kondisi lingkunganmu,\nbukan cuma sesaat',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: titleFontSz,
-              fontWeight: FontWeight.w800,
-              color: AppColors.onSurface,
-              height: 1.3,
+  // ─── PAGE 1: ONBOARDING PAGE 1 ───────────────────────────────────────────────
+  Widget _buildOnboardingPage1() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        child: Column(
+          children: [
+            const Spacer(),
+            // Illustration
+            _buildIllustration(
+              icon: Icons.air_rounded,
+              color: AppColors.primary,
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             ),
-          ),
-          SizedBox(height: vGapSm),
-          Text(
-            'Arahkan kamera, AI membaca udara, suhu, dan\n'
-            'kelembapan sekitarmu — lalu memberi saran\n'
-            'yang masuk akal untuk jangka panjang.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: subtitleFontSz,
-              color: AppColors.onSurface.withValues(alpha: 0.6),
-              height: 1.5,
-            ),
-          ),
-          SizedBox(height: vGapMd),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _chip(Icons.qr_code_scanner, 'Scan Instan', chipFontSz),
-              _chip(Icons.show_chart, 'Tren harian', chipFontSz),
-              _chip(Icons.lightbulb_outline, 'Saran AI', chipFontSz),
-            ],
-          ),
-          SizedBox(height: vGapLg),
-          SizedBox(
-            width: double.infinity,
-            height: btnHeight,
-            child: ElevatedButton(
-              onPressed: () => _pageController.animateToPage(
-                1,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOutCubic,
+            const SizedBox(height: 48),
+            // Content
+            const Text(
+              'Pantau Kualitas Udara',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.onPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+            ),
+            const SizedBox(height: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Dapatkan informasi real-time mengenai kualitas udara, suhu, dan kelembapan di sekitarmu dengan mudah.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                  height: 1.5,
                 ),
-                elevation: 0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Mulai Scan',
-                    style: TextStyle(
-                      fontSize: btnFontSz,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(Icons.arrow_forward_rounded, size: btnFontSz + 2),
-                ],
               ),
             ),
-          ),
-          SizedBox(height: vGapSm),
-        ],
+            const Spacer(),
+            // Page Indicators
+            _buildIndicators(0),
+            const SizedBox(height: 24),
+            // Next Button
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: _nextPage,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Selanjutnya',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  // ─── PAGE 2: LOGIN ────────────────────────────────────
-  Widget _buildLoginPage({
-    required double hPad,
-    required double titleFontSz,
-    required double subtitleFontSz,
-    required double btnHeight,
-    required double btnFontSz,
-    required double vGapSm,
-    required double vGapMd,
-  }) {
+  // ─── PAGE 2: ONBOARDING PAGE 2 ───────────────────────────────────────────────
+  Widget _buildOnboardingPage2() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        child: Column(
+          children: [
+            const Spacer(),
+            // Illustration
+            _buildIllustration(
+              icon: Icons.psychology_rounded,
+              color: AppColors.accent,
+              backgroundColor: AppColors.accent.withValues(alpha: 0.15),
+            ),
+            const SizedBox(height: 48),
+            // Content
+            const Text(
+              'Rekomendasi AI',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Dapatkan saran kesehatan dan aktivitas yang disesuaikan oleh AI untuk kondisi lingkungan sekitarmu.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+            ),
+            const Spacer(),
+            // Page Indicators
+            _buildIndicators(1),
+            const SizedBox(height: 24),
+            // Next Button
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: _nextPage,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Selanjutnya',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── PAGE 3: UNIFIED AUTH PAGE ──────────────────────────────────────────────
+  Widget _buildAuthPage() {
     return Consumer<AuthViewModel>(
       builder: (context, authVM, _) {
-        return SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(hPad, 0, hPad, vGapMd),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Back button
-              Align(
-                alignment: Alignment.topLeft,
-                child: GestureDetector(
-                  onTap: _goBack,
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.onSurface.withValues(alpha: 0.06),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.arrow_back_rounded,
-                      size: (btnHeight * 0.32).clamp(15.0, 20.0),
-                      color: AppColors.onSurface.withValues(alpha: 0.75),
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(height: vGapSm),
-
-              // Title
-              Text(
-                'Masuk ke akunmu',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: titleFontSz,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.onSurface,
-                  height: 1.3,
-                ),
-              ),
-              SizedBox(height: vGapSm * 0.5),
-              Text(
-                'Masukkan username dan password untuk melanjutkan.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: subtitleFontSz,
-                  color: AppColors.onSurface.withValues(alpha: 0.55),
-                  height: 1.45,
-                ),
-              ),
-
-              SizedBox(height: vGapMd),
-
-              // Username field
-              _inputField(
-                controller: _usernameCtrl,
-                label: 'Username',
-                icon: Icons.person_outline,
-                keyboardType: TextInputType.text,
-              ),
-
-              SizedBox(height: vGapSm),
-
-              // Password field
-              _inputField(
-                controller: _passCtrl,
-                label: 'Password',
-                icon: Icons.lock_outline,
-                obscure: _obscurePass,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePass
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                    size: 20,
-                    color: AppColors.onSurface.withValues(alpha: 0.45),
-                  ),
-                  onPressed: () =>
-                      setState(() => _obscurePass = !_obscurePass),
-                ),
-              ),
-
-              SizedBox(height: vGapMd),
-
-              // Error
-              if (authVM.errorMessage != null) ...[
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: AppColors.error.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Logo
+                Center(
+                  child: Column(
                     children: [
-                      const Icon(Icons.error_outline,
-                          color: AppColors.error, size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          authVM.errorMessage!,
-                          style: const TextStyle(
-                              color: AppColors.error, fontSize: 13),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.08),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.eco_rounded,
+                          color: AppColors.primary,
+                          size: 36,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        AppStrings.appName,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary,
+                          letterSpacing: 1,
                         ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: vGapSm),
+                const SizedBox(height: 16),
+
+                // Active Form
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: _activeAuthTab == 0 ? _buildLoginForm(authVM) : _buildRegisterForm(authVM),
+                ),
               ],
-
-              // Login button
-              SizedBox(
-                height: btnHeight,
-                child: ElevatedButton(
-                  onPressed: authVM.isLoading ? null : () => _submit(authVM),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 0,
-                    disabledBackgroundColor:
-                        AppColors.primary.withValues(alpha: 0.55),
-                  ),
-                  child: authVM.isLoading
-                      ? SizedBox(
-                          width: btnHeight * 0.38,
-                          height: btnHeight * 0.38,
-                          child: const CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation(Colors.white),
-                          ),
-                        )
-                      : Text(
-                          'Masuk',
-                          style: TextStyle(
-                            fontSize: btnFontSz,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                ),
-              ),
-
-              SizedBox(height: vGapSm),
-
-              // Navigate to Register page
-              GestureDetector(
-                onTap: () {
-                  authVM.clearError();
-                  Navigator.of(context).pushNamed('/register');
-                },
-                child: Text(
-                  'Belum punya akun? Daftar sekarang',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: (MediaQuery.of(context).size.width * 0.033)
-                        .clamp(11.0, 14.0),
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-
-              SizedBox(height: vGapSm),
-            ],
+            ),
           ),
         );
       },
     );
   }
 
-  void _submit(AuthViewModel authVM) {
-    final username = _usernameCtrl.text.trim();
-    final pass = _passCtrl.text;
-
-    if (username.isEmpty || pass.isEmpty) {
-      return;
-    }
-
-    authVM.signIn(username, pass);
-  }
-
-  Widget _inputField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    bool obscure = false,
-    TextInputType? keyboardType,
-    Widget? suffixIcon,
-  }) {
-    final double sw = MediaQuery.of(context).size.width;
-    final double fontSize = (sw * 0.037).clamp(13.0, 15.5);
-    return TextField(
-      controller: controller,
-      obscureText: obscure,
-      keyboardType: keyboardType,
-      style: TextStyle(
-        fontSize: fontSize,
-        color: AppColors.onSurface,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(
-          fontSize: fontSize * 0.93,
-          color: AppColors.onSurface.withValues(alpha: 0.50),
-        ),
-        prefixIcon: Icon(
-          icon,
-          size: 20,
-          color: AppColors.onSurface.withValues(alpha: 0.40),
-        ),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: AppColors.surfaceVariant,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      ),
-    );
-  }
-
-  Widget _chip(IconData icon, String label, double fontSize) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+  // ─── LOGIN FORM ────────────────────────────────────────────────────────────
+  Widget _buildLoginForm(AuthViewModel authVM) {
+    return Form(
+      key: _formKeyLogin,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(icon, size: fontSize + 2, color: AppColors.primary),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w600,
-              color: AppColors.onSurface.withValues(alpha: 0.75),
+          // Username
+          _buildInputField(
+            controller: _loginUsernameCtrl,
+            label: 'USERNAME',
+            hint: 'Masukkan username Anda',
+            icon: Icons.person_outline_rounded,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) {
+                return 'Username wajib diisi';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
+
+          // Password
+          _buildInputField(
+            controller: _loginPassCtrl,
+            label: 'PASSWORD',
+            hint: 'Masukkan password Anda',
+            icon: Icons.lock_outline_rounded,
+            obscure: _obscureLoginPass,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureLoginPass ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                color: AppColors.textMuted,
+                size: 20,
+              ),
+              onPressed: () => setState(() => _obscureLoginPass = !_obscureLoginPass),
+            ),
+            validator: (v) {
+              if (v == null || v.isEmpty) {
+                return 'Password wajib diisi';
+              }
+              return null;
+            },
+          ),
+
+          // Error Message
+          if (authVM.errorMessage != null) ...[
+            const SizedBox(height: 16),
+            _buildErrorMessage(authVM.errorMessage!),
+          ],
+
+          const SizedBox(height: 32),
+
+          // Login Button
+          SizedBox(
+            height: 56,
+            child: ElevatedButton(
+              onPressed: authVM.isLoading ? null : () => _submitLogin(authVM),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 0,
+              ),
+              child: authVM.isLoading
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation(Colors.white),
+                      ),
+                    )
+                  : const Text(
+                      'Masuk',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _activeAuthTab = 1;
+                authVM.clearError();
+              });
+            },
+            child: const Text(
+              'Belum punya akun? Daftar Sekarang',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  // ─── REGISTER FORM ─────────────────────────────────────────────────────────
+  Widget _buildRegisterForm(AuthViewModel authVM) {
+    return Form(
+      key: _formKeyRegister,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Full Name
+          _buildInputField(
+            controller: _regNameCtrl,
+            label: 'NAMA LENGKAP',
+            hint: 'Nama lengkap Anda',
+            icon: Icons.badge_outlined,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) {
+                return 'Nama lengkap wajib diisi';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+
+          // Username
+          _buildInputField(
+            controller: _regUsernameCtrl,
+            label: 'USERNAME',
+            hint: 'Pilih username',
+            icon: Icons.alternate_email_rounded,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) {
+                return 'Username wajib diisi';
+              }
+              if (v.trim().length < 3) {
+                return 'Username minimal 3 karakter';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+
+          // Email
+          _buildInputField(
+            controller: _regEmailCtrl,
+            label: 'EMAIL (OPSIONAL)',
+            hint: 'Alamat email Anda',
+            icon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
+          ),
+          const SizedBox(height: 16),
+
+          // Password
+          _buildInputField(
+            controller: _regPassCtrl,
+            label: 'PASSWORD',
+            hint: 'Minimal 6 karakter',
+            icon: Icons.lock_outline_rounded,
+            obscure: _obscureRegPass,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureRegPass ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                color: AppColors.textMuted,
+                size: 20,
+              ),
+              onPressed: () => setState(() => _obscureRegPass = !_obscureRegPass),
+            ),
+            validator: (v) {
+              if (v == null || v.isEmpty) {
+                return 'Password wajib diisi';
+              }
+              if (v.length < 6) {
+                return 'Password minimal 6 karakter';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+
+          // Confirm Password
+          _buildInputField(
+            controller: _regConfirmPassCtrl,
+            label: 'KONFIRMASI PASSWORD',
+            hint: 'Ulangi password Anda',
+            icon: Icons.lock_reset_rounded,
+            obscure: _obscureRegConfirm,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureRegConfirm ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                color: AppColors.textMuted,
+                size: 20,
+              ),
+              onPressed: () => setState(() => _obscureRegConfirm = !_obscureRegConfirm),
+            ),
+            validator: (v) {
+              if (v != _regPassCtrl.text) {
+                return 'Password tidak cocok';
+              }
+              return null;
+            },
+          ),
+
+          // Error Message
+          if (authVM.errorMessage != null) ...[
+            const SizedBox(height: 16),
+            _buildErrorMessage(authVM.errorMessage!),
+          ],
+
+          const SizedBox(height: 24),
+
+          // Terms and Conditions Notice
+          const Text(
+            'Dengan mendaftar, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi VibEco.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+              height: 1.4,
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Register Button
+          SizedBox(
+            height: 56,
+            child: ElevatedButton(
+              onPressed: authVM.isLoading ? null : () => _submitRegister(authVM),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 0,
+              ),
+              child: authVM.isLoading
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation(Colors.white),
+                      ),
+                    )
+                  : const Text(
+                      'Daftar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _activeAuthTab = 0;
+                authVM.clearError();
+              });
+            },
+            child: const Text(
+              'Sudah punya akun? Login Sekarang',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── HELPER WIDGETS ─────────────────────────────────────────────────────────
+
+  Widget _buildIllustration({
+    required IconData icon,
+    required Color color,
+    required Color backgroundColor,
+  }) {
+    return Center(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Outer circle
+          Container(
+            width: 180,
+            height: 180,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: backgroundColor,
+            ),
+          ),
+          // Icon Container
+          Container(
+            width: 100,
+            height: 100,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 48,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIndicators(int activeIndex) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        2,
+        (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: index == activeIndex ? 24 : 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: index == activeIndex ? AppColors.primary : AppColors.textMuted.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    bool obscure = false,
+    TextInputType? keyboardType,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          obscureText: obscure,
+          keyboardType: keyboardType,
+          validator: validator,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textPrimary,
+          ),
+          decoration: InputDecoration(
+            hintText: hint,
+            prefixIcon: Icon(icon, size: 20, color: AppColors.textMuted),
+            suffixIcon: suffixIcon,
+            filled: true,
+            fillColor: AppColors.surfaceVariant,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.error, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildErrorMessage(String message) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.error.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: AppColors.error, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(color: AppColors.error, fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _submitLogin(AuthViewModel authVM) {
+    if (!_formKeyLogin.currentState!.validate()) return;
+    FocusScope.of(context).unfocus();
+    authVM.signIn(
+      _loginUsernameCtrl.text.trim(),
+      _loginPassCtrl.text,
+    );
+  }
+
+  Future<void> _submitRegister(AuthViewModel authVM) async {
+    if (!_formKeyRegister.currentState!.validate()) return;
+    FocusScope.of(context).unfocus();
+
+    await authVM.signUp(
+      username: _regUsernameCtrl.text.trim(),
+      password: _regPassCtrl.text,
+      displayName: _regNameCtrl.text.trim(),
+      email: _regEmailCtrl.text.trim().isEmpty ? null : _regEmailCtrl.text.trim(),
     );
   }
 }

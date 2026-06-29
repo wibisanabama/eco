@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:eco/features/splash/splash_view.dart';
 import 'package:eco/features/welcome/welcome_view.dart';
-import 'package:eco/features/auth/login_view.dart';
-import 'package:eco/features/auth/register_view.dart';
 import 'package:eco/features/home/home_view.dart';
 import 'package:eco/features/profile/profile_view.dart';
 import 'package:eco/features/chatbot/chatbot_view.dart';
@@ -61,11 +59,13 @@ class AppRouter {
       case splash:
         return const SplashView();
       case welcome:
-        return const WelcomeView();
+        final args = settings.arguments;
+        final int initialPage = args is int ? args : 0;
+        return WelcomeView(initialPage: initialPage);
       case login:
-        return const LoginView();
+        return const WelcomeView(initialPage: 3, initialAuthTab: 0);
       case register:
-        return const RegisterView();
+        return const WelcomeView(initialPage: 3, initialAuthTab: 1);
       case home:
         return const HomeView();
       case profile:
@@ -96,8 +96,8 @@ class AppRouter {
   static Map<String, WidgetBuilder> get routes => {
         splash: (context) => const SplashView(),
         welcome: (context) => const WelcomeView(),
-        login: (context) => const LoginView(),
-        register: (context) => const RegisterView(),
+        login: (context) => const WelcomeView(initialPage: 3, initialAuthTab: 0),
+        register: (context) => const WelcomeView(initialPage: 3, initialAuthTab: 1),
         home: (context) => const HomeView(),
         profile: (context) => const ProfileView(),
       };
