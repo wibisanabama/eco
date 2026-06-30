@@ -87,7 +87,7 @@ class _DashboardViewState extends State<DashboardView> {
               backgroundColor: AppColors.lightCardBackground,
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
                 children: [
                   // Custom App Bar
                   DashboardAppBar(

@@ -58,80 +58,83 @@ class _AnchoredBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        // Navbar Background Container
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(28),
-              topRight: Radius.circular(28),
-            ),
-            border: Border(
-              top: BorderSide(
-                color: Colors.white.withValues(alpha: 0.08),
-                width: 1.5,
-              ),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 20,
-                offset: const Offset(0, -4),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(32),
+          topRight: Radius.circular(32),
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Colors.white.withValues(alpha: 0.08),
+            width: 1.5,
           ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 12), // Spacious spacing from the phone's home button
-              child: SizedBox(
-                height: 72,
-                child: Row(
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: SizedBox(
+            height: 72,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     // Home Tab
-                    _NavBarItem(
-                      icon: Icons.home_outlined,
-                      activeIcon: Icons.home_outlined,
-                      label: 'Home',
-                      isSelected: currentIndex == 0,
-                      onTap: () => onTap(0),
+                    Expanded(
+                      child: _NavBarItem(
+                        icon: Icons.home_rounded,
+                        activeIcon: Icons.home_rounded,
+                        label: 'Home',
+                        isSelected: currentIndex == 0,
+                        onTap: () => onTap(0),
+                      ),
                     ),
 
-                    // Placeholder for the floating center button
+                    // Placeholder space for the floating center button
                     const SizedBox(width: 88),
 
                     // History Tab
-                    _NavBarItem(
-                      icon: Icons.history_outlined,
-                      activeIcon: Icons.history_outlined,
-                      label: 'Riwayat',
-                      isSelected: currentIndex == 2,
-                      onTap: () => onTap(2),
+                    Expanded(
+                      child: _NavBarItem(
+                        icon: Icons.history_rounded,
+                        activeIcon: Icons.history_rounded,
+                        label: 'Riwayat',
+                        isSelected: currentIndex == 2,
+                        onTap: () => onTap(2),
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
-          ),
-        ),
 
-        // Floating Center Camera Button
-        Positioned(
-          top: -32, // Positioned half-in, half-out of the taller navbar
-          left: 0,
-          right: 0,
-          child: Center(
-            child: _CameraCenterButton(
-              isSelected: currentIndex == 1,
-              onTap: () => onTap(1),
+                // Floating Center Camera Button (Anchored style, half-out)
+                Positioned(
+                  top: -28,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: _CameraCenterButton(
+                      isSelected: currentIndex == 1,
+                      onTap: () => onTap(1),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -156,36 +159,40 @@ class _NavBarItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 80,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              decoration: BoxDecoration(
-                color: isSelected ? Colors.white.withValues(alpha: 0.12) : Colors.transparent,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(
-                isSelected ? activeIcon : icon,
-                color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.5),
-                size: 24,
-              ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedScale(
+            scale: isSelected ? 1.15 : 1.0,
+            duration: const Duration(milliseconds: 200),
+            child: Icon(
+              isSelected ? activeIcon : icon,
+              color: isSelected ? AppColors.accent : Colors.white.withValues(alpha: 0.4),
+              size: 24,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.5),
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                letterSpacing: 0.2,
-              ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.4),
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              letterSpacing: 0.2,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          // Active indicator dot
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: isSelected ? 5 : 0,
+            height: 5,
+            decoration: const BoxDecoration(
+              color: AppColors.accent,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -204,47 +211,30 @@ class _CameraCenterButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: 72,
-        height: 72,
-        decoration: const BoxDecoration(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutBack,
+        width: isSelected ? 64 : 60,
+        height: isSelected ? 64 : 60,
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.transparent,
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Outer Ring (White circle with a shadow)
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.15),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-            ),
-            // Inner Circle (High contrast Green background, Navy camera icon)
-            Container(
-              width: 58,
-              height: 58,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.accent, // High contrast brand green
-              ),
-              child: const Icon(
-                Icons.photo_camera_rounded, // Camera icon
-                color: AppColors.primary, // High contrast navy icon
-                size: 28,
-              ),
+          color: isSelected ? AppColors.accent : AppColors.secondary,
+          border: Border.all(
+            color: Colors.white,
+            width: 3,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
+        ),
+        child: Icon(
+          Icons.photo_camera_rounded,
+          color: isSelected ? AppColors.primary : Colors.white,
+          size: 26,
         ),
       ),
     );
