@@ -27,16 +27,18 @@ class HomeView extends StatelessWidget {
                 HistoryView(),
               ],
             ),
-            bottomNavigationBar: _AnchoredBottomBar(
-              currentIndex: homeVM.currentIndex,
-              onTap: (index) {
-                HapticFeedback.mediumImpact();
-                homeVM.setIndex(index);
-                if (index == 2) {
-                  context.read<HistoryViewModel>().loadHistory();
-                }
-              },
-            ),
+            bottomNavigationBar: homeVM.currentIndex == 1
+                ? null
+                : _AnchoredBottomBar(
+                    currentIndex: homeVM.currentIndex,
+                    onTap: (index) {
+                      HapticFeedback.mediumImpact();
+                      homeVM.setIndex(index);
+                      if (index == 2) {
+                        context.read<HistoryViewModel>().loadHistory();
+                      }
+                    },
+                  ),
           );
         },
       ),
