@@ -178,7 +178,7 @@ class _CameraViewState extends State<CameraView> {
               left: 0,
               right: 0,
               child: Container(
-                padding: EdgeInsets.fromLTRB(32, 24, 32, MediaQuery.of(context).padding.bottom + 24),
+                padding: EdgeInsets.fromLTRB(32, 24, 32, MediaQuery.of(context).padding.bottom + 56),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
