@@ -163,6 +163,13 @@ class ApiService {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return data;
       }
+      
+      // Auto-logout on unauthorized/forbidden sessions (JWT expired or user deleted from DB)
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        signOut();
+        throw Exception(data['error'] ?? 'Sesi Anda telah berakhir. Silakan login kembali.');
+      }
+      
       throw Exception(data['error'] ?? 'Terjadi kesalahan server (${response.statusCode})');
     } on FormatException {
       throw Exception('Server error (${response.statusCode}): Tanggapan server tidak valid (bukan JSON).');

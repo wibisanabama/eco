@@ -105,7 +105,7 @@ const checkDb = (req, res, next) => {
 };
 
 // JWT Authentication Middleware
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -113,13 +113,22 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ error: 'Akses ditolak. Token JWT diperlukan.' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Token JWT tidak valid atau kedaluwarsa.' });
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+
+    // Verify if the user still exists in the database to prevent foreign key issues
+    if (pool) {
+      const [rows] = await pool.query('SELECT id FROM users WHERE id = ?', [decoded.id]);
+      if (rows.length === 0) {
+        return res.status(401).json({ error: 'Sesi Anda telah berakhir atau akun telah dihapus. Silakan login kembali.' });
+      }
     }
-    req.user = user;
+
     next();
-  });
+  } catch (err) {
+    return res.status(403).json({ error: 'Token JWT tidak valid atau kedaluwarsa.' });
+  }
 };
 
 // Multer Storage Configuration for Avatar
