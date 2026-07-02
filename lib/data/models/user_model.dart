@@ -1,3 +1,5 @@
+import 'package:eco/data/services/api_service.dart';
+
 class UserModel {
   final String id;
   final String username;
@@ -16,12 +18,17 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    final photo = json['photo_url'] as String?;
+    final resolvedPhoto = (photo != null && photo.isNotEmpty)
+        ? (photo.startsWith('http') ? photo : ApiService.resolveUrl(photo))
+        : null;
+
     return UserModel(
       id: json['id'] as String,
       username: json['username'] as String? ?? '',
       email: json['email'] as String? ?? '',
       displayName: json['display_name'] as String? ?? '',
-      photoUrl: json['photo_url'] as String?,
+      photoUrl: resolvedPhoto,
       createdAt: _parseDate(json['created_at']),
     );
   }

@@ -165,6 +165,7 @@ class _ProfileViewState extends State<ProfileView> {
                                     onPickImage: () async {
                                       final success = await profileVM.pickAndUploadAvatar();
                                       if (success && context.mounted) {
+                                        context.read<AuthViewModel>().loadUserProfile();
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
                                             content: Text('Foto profil berhasil diperbarui'),
@@ -176,6 +177,7 @@ class _ProfileViewState extends State<ProfileView> {
                                     onRemoveImage: () async {
                                       final success = await profileVM.removeAvatar();
                                       if (success && context.mounted) {
+                                        context.read<AuthViewModel>().loadUserProfile();
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
                                             content: Text('Foto profil berhasil dihapus'),
@@ -241,6 +243,7 @@ class _ProfileViewState extends State<ProfileView> {
                                           FocusScope.of(context).unfocus();
                                           final success = await profileVM.updateDisplayName(_nameController.text.trim());
                                           if (success && context.mounted) {
+                                            context.read<AuthViewModel>().loadUserProfile();
                                             ScaffoldMessenger.of(context).showSnackBar(
                                               const SnackBar(
                                                 content: Text('Nama berhasil disimpan'),
