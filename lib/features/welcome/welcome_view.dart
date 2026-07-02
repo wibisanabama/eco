@@ -93,7 +93,7 @@ class _WelcomeViewState extends State<WelcomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _currentPage == 0 ? AppColors.primary : AppColors.background,
+      backgroundColor: const Color(0xFFF7F7F5),
       body: PageView(
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(), // Disable swipe, button-only navigation
@@ -124,12 +124,12 @@ class _WelcomeViewState extends State<WelcomeView> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
+                color: AppColors.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.eco_rounded,
-                color: Colors.white,
+                color: AppColors.primary,
                 size: 64,
               ),
             ),
@@ -139,7 +139,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               'SAVE\nTHE\nPLANET',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.primary,
                 fontSize: 48,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 4,
@@ -154,8 +154,8 @@ class _WelcomeViewState extends State<WelcomeView> {
               child: ElevatedButton(
                 onPressed: _nextPage,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),

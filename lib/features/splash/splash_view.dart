@@ -81,11 +81,11 @@ class _SplashViewState extends State<SplashView>
     final double taglineHPad = (sw * 0.10).clamp(24.0, 70.0);
 
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: const Color(0xFFF7F7F5),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: AppColors.primary,
+        color: const Color(0xFFF7F7F5),
         child: FadeTransition(
           opacity: _fadeAnim,
           child: Column(
@@ -102,12 +102,12 @@ class _SplashViewState extends State<SplashView>
                       Container(
                         padding: EdgeInsets.all(iconPad),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.12),
+                          color: AppColors.primary.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(iconRadius),
                         ),
                         child: Icon(
                           Icons.eco,
-                          color: Colors.white,
+                          color: AppColors.primary,
                           size: iconSz,
                         ),
                       ),
@@ -115,7 +115,7 @@ class _SplashViewState extends State<SplashView>
                       Text(
                         AppStrings.appName,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.primary,
                           fontSize: nameFontSz,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.3,
@@ -136,7 +136,7 @@ class _SplashViewState extends State<SplashView>
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: taglineFontSz,
-                    color: Colors.white.withValues(alpha: 0.60),
+                    color: AppColors.primary.withValues(alpha: 0.60),
                     letterSpacing: 0.2,
                     height: 1.5,
                   ),
