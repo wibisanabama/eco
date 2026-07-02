@@ -98,12 +98,17 @@ class AuthRepository {
     final id = ApiService.currentUserId;
     if (id == null) return null;
 
+    final rawPhoto = ApiService.currentUserPhotoUrl;
+    final resolvedPhoto = (rawPhoto != null && rawPhoto.isNotEmpty)
+        ? (rawPhoto.startsWith('http') ? rawPhoto : ApiService.resolveUrl(rawPhoto))
+        : null;
+
     return UserModel(
       id: id,
       username: ApiService.currentUserUsername ?? '',
       email: ApiService.currentUserEmail ?? '',
       displayName: ApiService.currentUserDisplayName ?? '',
-      photoUrl: ApiService.currentUserPhotoUrl,
+      photoUrl: resolvedPhoto,
       createdAt: ApiService.currentUserCreatedAt != null
           ? DateTime.tryParse(ApiService.currentUserCreatedAt!) ?? DateTime.now()
           : DateTime.now(),
